@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DocIA — Generador de documentos con inteligencia artificial</title>
+<meta name="description" content="Genera hojas de vida, cartas, contratos y descripciones de productos con IA. Gratis, rápido y listo para descargar." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #F5F2ED;
+    --bg2: #EDEAE4;
+    --bg3: #E3DED7;
+    --card: #FFFFFF;
+    --text: #1C1A17;
+    --text2: #6B6560;
+    --text3: #9E9990;
+    --accent: #C84B2F;
+    --accent2: #E8613F;
+    --border: rgba(28,26,23,0.12);
+    --border2: rgba(28,26,23,0.2);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  header {
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .badge-header {
+    font-size: 11px;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  /* HERO */
+  .hero {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 5rem 2rem 3rem;
+    text-align: center;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 1.2rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .hero p {
+    font-size: 17px;
+    color: var(--text2);
+    line-height: 1.7;
+    font-weight: 300;
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .hero-pills {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text2);
+    background: var(--card);
+  }
+
+  .pill svg { width: 14px; height: 14px; color: var(--accent); flex-shrink: 0; }
+
+  /* MAIN APP */
+  .app-wrapper {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+    animation: fadeUp 0.6s 0.2s ease both;
+    opacity: 0;
+  }
+
+  /* TABS */
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 560px) {
+    .tabs { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .tab {
+    padding: 10px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    cursor: pointer;
+    background: var(--card);
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .tab:hover { border-color: var(--border2); color: var(--text); }
+
+  .tab.active {
+    background: var(--text);
+    border-color: var(--text);
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .tab svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+  }
+
+  .form-section { display: none; }
+  .form-section.active { display: block; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .form-grid.full { grid-template-columns: 1fr; }
+
+  @media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .card { padding: 1.25rem; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  .field label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .field input,
+  .field textarea,
+  .field select {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.15s, background 0.15s;
+    resize: vertical;
+    outline: none;
+  }
+
+  .field input:focus,
+  .field textarea:focus,
+  .field select:focus {
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder { color: var(--text3); }
+
+  .field textarea { min-height: 90px; }
+
+  /* BUTTON */
+  .btn-generate {
+    width: 100%;
+    margin-top: 1.25rem;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    letter-spacing: -0.01em;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-generate:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn-generate:active { transform: translateY(0); }
+  .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-generate svg { width: 18px; height: 18px; }
+
+  /* RESULT */
+  .result-box {
+    margin-top: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .result-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg2);
+  }
+
+  .result-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .result-label .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #22C55E;
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .result-actions { display: flex; gap: 6px; }
+
+  .btn-dl {
+    padding: 6px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    background: var(--card);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .btn-dl:hover { background: var(--bg3); border-color: var(--accent); color: var(--accent); }
+  .btn-dl svg { width: 13px; height: 13px; }
+
+  .result-content {
+    padding: 20px;
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    max-height: 460px;
+    overflow-y: auto;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+  }
+
+  /* LOADING */
+  .loading-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 24px;
+    color: var(--text2);
+    font-size: 14px;
+  }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 12px;
+    color: var(--text3);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Doc<span>IA</span></div>
+  <span class="badge-header">✦ IA Colombia</span>
+</header>
+
+<section class="hero">
+  <p class="hero-eyebrow">✦ Documentos profesionales en segundos</p>
+  <h1>Redacta con <em>inteligencia</em>,<br>descarga al instante</h1>
+  <p>Hoja de vida, cartas, contratos y descripciones de producto generadas por IA. Sin registro, sin costo.</p>
+  <div class="hero-pills">
+    <span class="pill">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Sin registro
+    </span>
+    <span class="pill">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      Descarga PDF o TXT
+    </span>
+    <span class="pill">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Listo en segundos
+    </span>
+  </div>
+</section>
+
+<main class="app-wrapper">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('hv')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      Hoja de vida
+    </button>
+    <button class="tab" onclick="switchTab('carta')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      Carta
+    </button>
+    <button class="tab" onclick="switchTab('contrato')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Contrato
+    </button>
+    <button class="tab" onclick="switchTab('producto')">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+      Producto
+    </button>
+  </div>
+
+  <div class="card">
+
+    <!-- HOJA DE VIDA -->
+    <div class="form-section active" id="sec-hv">
+      <div class="form-grid">
+        <div class="field"><label>Nombre completo</label><input id="hv-nombre" placeholder="Juan Pérez García" /></div>
+        <div class="field"><label>Cargo / perfil objetivo</label><input id="hv-cargo" placeholder="Técnico en sistemas" /></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Teléfono</label><input id="hv-tel" placeholder="300 123 4567" /></div>
+        <div class="field"><label>Correo electrónico</label><input id="hv-email" placeholder="juan@correo.com" /></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Ciudad</label><input id="hv-ciudad" placeholder="Cali, Colombia" /></div>
+        <div class="field"><label>Nivel de estudios</label>
+          <select id="hv-estudios">
+            <option>Bachiller</option><option>Técnico</option><option>Tecnólogo</option>
+            <option>Profesional</option><option>Especialista</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="field"><label>Experiencia laboral</label><textarea id="hv-exp" placeholder="Ej: 3 años como técnico reparando celulares y computadores. Cambio de pantallas, upgrades SSD, diagnóstico..."></textarea></div>
+      </div>
+      <div class="form-grid full">
+        <div class="field"><label>Habilidades</label><input id="hv-skills" placeholder="Reparación de equipos, atención al cliente, Excel, manejo de caja..." /></div>
+      </div>
+      <button class="btn-generate" onclick="generar('hv')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Generar hoja de vida
+      </button>
+    </div>
+
+    <!-- CARTA -->
+    <div class="form-section" id="sec-carta">
+      <div class="form-grid">
+        <div class="field"><label>Tu nombre</label><input id="carta-nombre" placeholder="Juan Pérez" /></div>
+        <div class="field"><label>Tipo de carta</label>
+          <select id="carta-tipo">
+            <option>Presentación / empleo</option><option>Reclamo</option>
+            <option>Solicitud</option><option>Agradecimiento</option><option>Referencia / recomendación</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Dirigida a</label><input id="carta-dest" placeholder="Gerente de Recursos Humanos" /></div>
+        <div class="field"><label>Empresa / entidad</label><input id="carta-empresa" placeholder="Empresa XYZ S.A.S." /></div>
+      </div>
+      <div class="form-grid full">
+        <div class="field"><label>Puntos clave a comunicar</label><textarea id="carta-msg" placeholder="Ej: Tengo 3 años de experiencia en el sector, conozco la empresa, busco empleo como técnico..."></textarea></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Tono</label>
+          <select id="carta-tono"><option>Formal</option><option>Cordial</option><option>Firme / exigente</option></select>
+        </div>
+        <div class="field"><label>Ciudad y fecha</label><input id="carta-fecha" placeholder="Cali, junio de 2026" /></div>
+      </div>
+      <button class="btn-generate" onclick="generar('carta')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Generar carta
+      </button>
+    </div>
+
+    <!-- CONTRATO -->
+    <div class="form-section" id="sec-contrato">
+      <div class="form-grid">
+        <div class="field"><label>Tipo de contrato</label>
+          <select id="con-tipo">
+            <option>Prestación de servicios</option><option>Compraventa</option>
+            <option>Arrendamiento</option><option>Trabajo independiente</option>
+          </select>
+        </div>
+        <div class="field"><label>Ciudad</label><input id="con-ciudad" placeholder="Cali" /></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Parte 1 (contratante)</label><input id="con-p1" placeholder="Juan Pérez García" /></div>
+        <div class="field"><label>Parte 2 (contratado)</label><input id="con-p2" placeholder="María López" /></div>
+      </div>
+      <div class="form-grid full">
+        <div class="field"><label>Objeto del contrato</label><textarea id="con-objeto" placeholder="Ej: Reparación de pantalla de celular Samsung Galaxy A54, incluye mano de obra y repuesto original..."></textarea></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Valor / precio</label><input id="con-valor" placeholder="$ 120.000 COP" /></div>
+        <div class="field"><label>Duración / fecha límite</label><input id="con-duracion" placeholder="5 días hábiles" /></div>
+      </div>
+      <button class="btn-generate" onclick="generar('contrato')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Generar contrato
+      </button>
+    </div>
+
+    <!-- PRODUCTO -->
+    <div class="form-section" id="sec-producto">
+      <div class="form-grid">
+        <div class="field"><label>Nombre del producto</label><input id="prod-nombre" placeholder="Smartwatch deportivo" /></div>
+        <div class="field"><label>Precio</label><input id="prod-precio" placeholder="$ 89.900 COP" /></div>
+      </div>
+      <div class="form-grid full">
+        <div class="field"><label>Características principales</label><textarea id="prod-caract" placeholder="Ej: Pantalla 1.8 pulgadas, batería 7 días, IP67, monitor cardíaco, compatible Android e iOS..."></textarea></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label>Público objetivo</label><input id="prod-publico" placeholder="Jóvenes, deportistas, personas activas..." /></div>
+        <div class="field"><label>Plataforma de venta</label>
+          <select id="prod-plataforma">
+            <option>WhatsApp Business</option><option>Instagram</option>
+            <option>Tienda Nube</option><option>Mercado Libre</option><option>General</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-generate" onclick="generar('producto')">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Generar descripción
+      </button>
+    </div>
+
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-box" id="result-box" style="display:none;">
+    <div class="result-header">
+      <span class="result-label">
+        <span class="dot"></span>
+        <span id="result-label-text">Documento listo</span>
+      </span>
+      <div class="result-actions">
+        <button class="btn-dl" onclick="descargarTXT()">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Descargar .txt
+        </button>
+        <button class="btn-dl" onclick="descargarHTML()">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          Descargar .html
+        </button>
+      </div>
+    </div>
+    <div class="result-content" id="result-content"></div>
+  </div>
+
+</main>
+
+<footer>
+  Hecho con IA · DocIA Colombia &nbsp;·&nbsp; Los documentos son modelos de referencia
+</footer>
+
+<script>
+let resultText = '';
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['hv','carta','contrato','producto'][i] === tab);
+  });
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + tab).classList.add('active');
+  document.getElementById('result-box').style.display = 'none';
+}
+
+function g(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function buildPrompt(tipo) {
+  if (tipo === 'hv') return `Redacta una hoja de vida profesional en español para Colombia:\n- Nombre: ${g('hv-nombre')}\n- Perfil objetivo: ${g('hv-cargo')}\n- Teléfono: ${g('hv-tel')}\n- Correo: ${g('hv-email')}\n- Ciudad: ${g('hv-ciudad')}\n- Estudios: ${g('hv-estudios')}\n- Experiencia: ${g('hv-exp')}\n- Habilidades: ${g('hv-skills')}\n\nSecciones: Datos personales, Perfil profesional, Experiencia, Formación, Habilidades. Tono profesional. Texto plano listo para copiar.`;
+  if (tipo === 'carta') return `Redacta una carta de tipo "${g('carta-tipo')}" en español, tono ${g('carta-tono').toLowerCase()}, para Colombia:\n- Remitente: ${g('carta-nombre')}\n- Dirigida a: ${g('carta-dest')} de ${g('carta-empresa')}\n- Fecha: ${g('carta-fecha')}\n- Mensaje: ${g('carta-msg')}\n\nEstructura formal colombiana: lugar y fecha, destinatario, asunto, cuerpo, despedida, firma. Texto plano.`;
+  if (tipo === 'contrato') return `Redacta un contrato de ${g('con-tipo')} simple en español para Colombia:\n- Ciudad: ${g('con-ciudad')}\n- Parte 1: ${g('con-p1')}\n- Parte 2: ${g('con-p2')}\n- Objeto: ${g('con-objeto')}\n- Valor: ${g('con-valor')}\n- Duración: ${g('con-duracion')}\n\nCláusulas básicas: objeto, valor, duración, obligaciones, terminación, firmas. Aclara que es modelo de referencia y se recomienda revisión legal.`;
+  if (tipo === 'producto') return `Redacta una descripción de producto para vender en ${g('prod-plataforma')} en Colombia:\n- Producto: ${g('prod-nombre')}\n- Precio: ${g('prod-precio')}\n- Características: ${g('prod-caract')}\n- Público: ${g('prod-publico')}\n\nGancho inicial, beneficios, llamado a la acción. Tono cercano y vendedor. Emojis si la plataforma es WhatsApp o Instagram.`;
+}
+
+async function generar(tipo) {
+  const btn = document.querySelector('#sec-' + tipo + ' .btn-generate');
+  const box = document.getElementById('result-box');
+  const content = document.getElementById('result-content');
+  const label = document.getElementById('result-label-text');
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Generando documento...';
+
+  box.style.display = 'block';
+  content.innerHTML = '<div class="loading-wrap"><div class="spinner"></div> La IA está redactando tu documento...</div>';
+
+  const labels = { hv: 'Hoja de vida lista', carta: 'Carta lista', contrato: 'Contrato listo', producto: 'Descripción lista' };
+  label.textContent = labels[tipo];
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: buildPrompt(tipo) }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content.map(i => i.text || '').join('\n').trim();
+    resultText = text;
+    content.textContent = text;
+  } catch (e) {
+    content.textContent = 'Error generando el documento. Verifica tu conexión e intenta de nuevo.';
+  }
+
+  btn.disabled = false;
+  const icons = { hv:'👤', carta:'✉️', contrato:'📄', producto:'🏷️' };
+  btn.innerHTML = `<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Generar de nuevo`;
+}
+
+function descargarTXT() {
+  if (!resultText) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([resultText], { type: 'text/plain;charset=utf-8' }));
+  a.download = 'documento.txt';
+  a.click();
+}
+
+function descargarHTML() {
+  if (!resultText) return;
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Documento</title><style>body{font-family:Georgia,serif;max-width:720px;margin:48px auto;padding:0 24px;line-height:1.9;color:#1a1a1a;font-size:15px;}pre{white-space:pre-wrap;font-family:inherit;}@media print{body{margin:20px;}}</style></head><body><pre>${resultText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body></html>`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+  a.download = 'documento.html';
+  a.click();
+}
+</script>
+</body>
+</html>
