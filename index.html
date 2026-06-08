@@ -286,65 +286,92 @@ function buildPrompt(tipo) {
   if (tipo === 'producto') return `Redacta una descripción de producto para ${g('prod-plataforma')} en Colombia:\n- Producto: ${g('prod-nombre')}\n- Precio: ${g('prod-precio')}\n- Características: ${g('prod-caract')}\n- Público: ${g('prod-publico')}\n\nGancho inicial, beneficios, llamado a la acción. Tono vendedor y cercano.`;
 }
 
+
 async function generar(tipo) {
   const btn = document.querySelector('#sec-' + tipo + ' .btn-generate');
   const box = document.getElementById('result-box');
   const inner = document.getElementById('result-inner');
   const label = document.getElementById('result-label-text');
-  const btnPdf = document.getElementById('btn-pdf');
-  const btnWord = document.getElementById('btn-word');
 
   btn.disabled = true;
-  btn.textContent = 'Generando...';
   box.style.display = 'block';
-  inner.innerHTML = '<div class="loading-wrap"><div class="spinner"></div> La IA está redactando tu documento...</div>';
 
-  const labels = {hv:'Hoja de vida lista',carta:'Carta lista',contrato:'Contrato listo',producto:'Descripción lista'};
-  label.textContent = labels[tipo];
-  btnPdf.style.display = tipo === 'hv' ? 'flex' : 'flex';
-  btnWord.style.display = 'flex';
+  let text = '';
 
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{role:'user', content: buildPrompt(tipo)}]
-      })
-    });
-    const data = await res.json();
-    const text = data.content.map(i => i.text || '').join('\n').trim();
-    resultText = text;
+  if(tipo==='hv'){
+    const perfil = `Profesional con formación ${g('hv-estudios')} orientado al cargo de ${g('hv-cargo')}. Cuenta con experiencia en ${g('hv-exp')} y habilidades en ${g('hv-skills')}. Destaca por su responsabilidad, aprendizaje continuo y orientación al cliente.`;
+    hvData = {
+      nombre:g('hv-nombre'), cargo:g('hv-cargo'), tel:g('hv-tel'),
+      email:g('hv-email'), ciudad:g('hv-ciudad'), foto:fotoDataURL,
+      perfil:perfil,
+      experiencia:g('hv-exp'),
+      formacion:g('hv-formacion'),
+      habilidades:g('hv-skills')
+    };
+    renderHVPreview(hvData, inner);
+    resultText = JSON.stringify(hvData,null,2);
+  }
 
-    if (tipo === 'hv') {
-      let parsed;
-      try {
-        const clean = text.replace(/```json|```/g,'').trim();
-        parsed = JSON.parse(clean);
-      } catch(e) { parsed = null; }
+  if(tipo==='carta'){
+    text = `${g('carta-fecha')}
 
-      hvData = {
-        nombre: g('hv-nombre'), cargo: g('hv-cargo'),
-        tel: g('hv-tel'), email: g('hv-email'), ciudad: g('hv-ciudad'),
-        estudios: g('hv-estudios'), foto: fotoDataURL,
-        perfil: parsed ? parsed.perfil : text,
-        experiencia: parsed ? parsed.experiencia : '',
-        formacion: parsed ? parsed.formacion : g('hv-formacion'),
-        habilidades: parsed ? parsed.habilidades : g('hv-skills')
-      };
-      renderHVPreview(hvData, inner);
-    } else {
-      inner.innerHTML = `<div class="result-content">${text}</div>`;
-    }
-  } catch(e) {
-    inner.innerHTML = '<div class="result-content" style="color:var(--accent)">Error generando el documento. Verifica tu conexión e intenta de nuevo.</div>';
+Señor(a) ${g('carta-dest')}
+${g('carta-empresa')}
+
+Asunto: ${g('carta-tipo')}
+
+Cordial saludo.
+
+${g('carta-msg')}
+
+Agradezco su atención.
+
+Atentamente,
+${g('carta-nombre')}`;
+    inner.innerHTML = `<div class="result-content">${text}</div>`;
+    resultText=text;
+  }
+
+  if(tipo==='contrato'){
+    text = `CONTRATO DE ${g('con-tipo').toUpperCase()}
+
+Ciudad: ${g('con-ciudad')}
+Contratante: ${g('con-p1')}
+Contratado: ${g('con-p2')}
+
+Objeto:
+${g('con-objeto')}
+
+Valor: ${g('con-valor')}
+Duración: ${g('con-duracion')}
+
+Las partes aceptan las condiciones descritas anteriormente.
+
+Firma Contratante: __________________
+Firma Contratado: __________________`;
+    inner.innerHTML = `<div class="result-content">${text}</div>`;
+    resultText=text;
+  }
+
+  if(tipo==='producto'){
+    text = `🔥 ${g('prod-nombre')}
+
+Precio: ${g('prod-precio')}
+
+Características:
+${g('prod-caract')}
+
+Ideal para: ${g('prod-publico')}
+
+¡Contáctanos para más información y disponibilidad!`;
+    inner.innerHTML = `<div class="result-content">${text}</div>`;
+    resultText=text;
   }
 
   btn.disabled = false;
   btn.textContent = '⚡ Generar de nuevo';
 }
+
 
 function renderHVPreview(d, container) {
   const fotoHTML = d.foto
